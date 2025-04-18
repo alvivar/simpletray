@@ -1,6 +1,6 @@
 # Tray Demo Tray Application
 
-This repository contains a simple Python script (`tray.py`) that creates a system tray icon for a "Tray Demo" application.
+This repository contains a simple Python script (`tray.py`) that creates a system tray icon.
 
 ## Features
 
