@@ -1,15 +1,13 @@
 import sys
-import threading
-
 import pystray
 from pystray import MenuItem as item
 from PIL import Image, ImageDraw
+from notifypy import Notify
 
 
 def create_image(width=64, height=64):
-    """Create an eye-like icon."""
-
     print("Creating icon image")
+
     # Create a transparent image (RGBA mode with transparent background)
     image = Image.new("RGBA", (width, height), color=(0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
@@ -30,72 +28,57 @@ def create_image(width=64, height=64):
     return image
 
 
+def notification(title, message):
+    print(f"Sending notification: Title='{title}', Message='{message}'")
+    notification = Notify()
+    notification.title = title
+    notification.message = message
+    notification.send()
+
+
 def on_show(icon, item):
     print("Show option selected")
-    icon.notify('You have selected "Show".')
+    notification("Show Action", "You selected the 'Show' option.")
 
 
 def on_settings(icon, item):
     print("Settings option selected")
-    icon.notify("Opening settings...")
+    notification("Settings Action", "You selected the 'Settings' option.")
 
 
-def on_quit(icon, item, stop_event):
+def on_quit(icon, item):
     print("Quit option selected")
-    stop_event.set()
+    icon.stop()
 
 
-def create_menu(stop_event):
+def create_menu():
     print("Creating menu items")
     return (
         item("Show", on_show),
         item("Settings", on_settings),
-        item("Quit", lambda icon, item: on_quit(icon, item, stop_event)),
+        item("Quit", on_quit),
     )
 
 
-def run_tray_in_thread(stop_event):
-    """Run the tray icon in a daemon thread and return the icon and thread."""
-
-    print("Initializing tray icon in thread")
-    icon = pystray.Icon(
-        name="tray_demo",
-        title="Tray Demo",
-        icon=create_image(),
-        menu=pystray.Menu(*create_menu(stop_event)),
-    )
-
-    def _run_icon():
-        print("Starting tray icon in thread")
-        icon.run()
-
-    tray_thread = threading.Thread(target=_run_icon, daemon=True)
-    print("Starting tray thread")
-    tray_thread.start()
-    print("Tray thread started")
-
-    return icon, tray_thread
+def setup(icon):
+    print("Icon setup complete.")
+    icon.visible = True
 
 
 if __name__ == "__main__":
     print("Main program started")
-    stop_event = threading.Event()
-    print("Creating tray icon")
-    icon, _ = run_tray_in_thread(stop_event)
+    image = create_image()
+    menu = create_menu()
 
-    try:
-        print("Entering main loop")
-        while not stop_event.wait(0.1):
-            pass
+    icon = pystray.Icon(
+        name="tray_demo",
+        title="Tray Demo",
+        icon=image,
+        menu=pystray.Menu(*menu),
+    )
 
-    except KeyboardInterrupt:
-        print("Application terminated by user")
-        stop_event.set()
+    print("Starting tray icon...")
+    icon.run(setup=setup)
 
-    finally:
-        if icon:
-            print("Stopping tray icon")
-            icon.stop()
-
-        print("Application exiting")
-        sys.exit(0)
+    print("Application exiting")
+    sys.exit(0)

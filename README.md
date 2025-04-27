@@ -6,6 +6,7 @@ This repository contains `tray.py`, a simple and quick example of how to create 
 
 -   Creates a basic system tray icon using `pystray` and `Pillow` (PIL).
 -   The icon has a context menu with "Show", "Settings", and "Quit" options.
+-   Shows desktop notifications using `notifypy` when menu items are selected.
 -   Runs the tray icon in a separate thread to avoid blocking the main application logic.
 -   Includes a basic icon image generated with `Pillow`.
 
@@ -14,6 +15,7 @@ This repository contains `tray.py`, a simple and quick example of how to create 
 -   Python 3.6+
 -   `pystray` library
 -   `Pillow` library
+-   `notifypy` library
 
 ## Installation
 
@@ -21,7 +23,7 @@ This repository contains `tray.py`, a simple and quick example of how to create 
 2. Install the required dependencies:
 
     ```bash
-    pip install pystray Pillow
+    pip install pystray Pillow notifypy
     ```
 
 ## Usage
